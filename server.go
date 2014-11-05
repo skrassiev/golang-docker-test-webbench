@@ -24,6 +24,7 @@ type Server struct {
 }
 
 func (s Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	log.Printf("New request from [%v]\n", r.RemoteAddr)
 	body := "Hello World\n"
 	// Try to keep the same amount of headers
 	w.Header().Set("Server", "gophr")
