@@ -24,7 +24,12 @@ type Server struct {
 }
 
 func (s Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Printf("Request from [%v]\n", r.RemoteAddr)
+	log.Printf("Request from [%v] -> %v\n", r.RemoteAddr, r.RequestURI)
+
+	if r.RequestURI == "/exit" {
+		os.Exit(2)
+	}
+
 	body := "Hello World\n"
 	// Try to keep the same amount of headers
 	w.Header().Set("Server", "gophr")
