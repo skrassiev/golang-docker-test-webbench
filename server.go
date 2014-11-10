@@ -72,6 +72,8 @@ func main() {
 		fcgi.Serve(unix, server)
 	}()
 
+	fmt.Println("HTTP server is running on port 8080. Try 'curl -v localhost:8080' from another windows. To terminate, call 'curl localhost:8080/exit'")
+
 	<-sigchan
 
 	if err := os.Remove(SOCK); err != nil {
