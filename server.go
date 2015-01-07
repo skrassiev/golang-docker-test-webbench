@@ -10,6 +10,7 @@ import (
 	"os/signal"
 	"runtime"
 	"syscall"
+	"time"
 )
 
 var (
@@ -24,13 +25,15 @@ type Server struct {
 }
 
 func (s Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Printf("Request from [%v] -> %v\n", r.RemoteAddr, r.RequestURI)
 
-	if r.RequestURI == "/exit" {
-		os.Exit(2)
+	if r.RequestURI != "/silent" {
+		if r.RequestURI == "/exit" {
+			os.Exit(2)
+		}
+		log.Printf("Request from [%v] -> %v\n", r.RemoteAddr, r.RequestURI)
 	}
 
-	body := "Hello World\n"
+	body := fmt.Sprintf("Hello World at %v\n", time.Now())
 	// Try to keep the same amount of headers
 	w.Header().Set("Server", "gophr")
 	w.Header().Set("Connection", "keep-alive")
