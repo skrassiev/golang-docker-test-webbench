@@ -78,8 +78,14 @@ func main() {
 	server := Server{}
 
 	go func() {
-		http.Handle("/", server)
-		if err := http.ListenAndServe(":8080", nil); err != nil {
+
+		srv := http.Server{
+			Addr:        ":8080",
+			Handler:     server,
+			ReadTimeout: 2 * time.Second,
+		}
+
+		if err := srv.ListenAndServe(); err != nil {
 			log.Fatal(err)
 		}
 	}()
