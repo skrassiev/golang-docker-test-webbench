@@ -22,6 +22,31 @@ const (
 )
 
 type Server struct {
+	ipAddress string
+}
+
+func (s *Server) ip() string {
+	if len(s.ipAddress) == 0 {
+		s.ipAddress = "<unknown>"
+		addrs, err := net.InterfaceAddrs()
+
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		for _, address := range addrs {
+
+			// check the address type and if it is not a loopback the display it
+			if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+				if ipnet.IP.To4() != nil {
+					s.ipAddress = ipnet.IP.String()
+				}
+
+			}
+		}
+	}
+	return s.ipAddress
 }
 
 func (s Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -33,7 +58,7 @@ func (s Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Request from [%v] -> %v\n", r.RemoteAddr, r.RequestURI)
 	}
 
-	body := fmt.Sprintf("Hello World at %v\n", time.Now())
+	body := fmt.Sprintf("[%v] Hello World at %v\n", s.ip(), time.Now())
 	// Try to keep the same amount of headers
 	w.Header().Set("Server", "gophr")
 	w.Header().Set("Connection", "keep-alive")
