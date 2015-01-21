@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/signal"
 	"runtime"
+	"strconv"
 	"syscall"
 	"time"
 )
@@ -18,7 +19,8 @@ var (
 )
 
 const (
-	SOCK = "/tmp/go.sock"
+	SOCK    = "/tmp/go.sock"
+	VERSION = 125
 )
 
 type Server struct {
@@ -55,10 +57,16 @@ func (s Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if r.RequestURI == "/exit" {
 			os.Exit(2)
 		}
+
 		log.Printf("Request from [%v] -> %v\n", r.RemoteAddr, r.RequestURI)
+
+		if v, err := strconv.Atoi(r.RequestURI[1:]); err == nil {
+			log.Printf("Sleeping for %v seconds\n", v)
+			time.Sleep(time.Duration(v) * time.Second)
+		}
 	}
 
-	body := fmt.Sprintf("[%v] Hello World at %v\n", s.ip(), time.Now())
+	body := fmt.Sprintf("[%v v:%v] Hello World at %v\n", s.ip(), VERSION, time.Now())
 	// Try to keep the same amount of headers
 	w.Header().Set("Server", "gophr")
 	w.Header().Set("Connection", "keep-alive")
@@ -108,7 +116,8 @@ func main() {
 
 	fmt.Println("HTTP server is running on port 8080. Try 'curl -v localhost:8080' from another windows. To terminate, call 'curl localhost:8080/exit'")
 
-	<-sigchan
+	s := <-sigchan
+	fmt.Println("Handling received signal ", s)
 
 	if err := os.Remove(SOCK); err != nil {
 		log.Fatal(err)

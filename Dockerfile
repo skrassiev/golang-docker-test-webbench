@@ -12,7 +12,7 @@ ADD . /go/src/github.com/skrassiev/golang-docker-test-webbench/
 RUN go install github.com/skrassiev/golang-docker-test-webbench
 
 # Run the outyet command by default when the container starts.
-ENTRYPOINT /go/bin/golang-docker-test-webbench
+ENTRYPOINT ["/go/bin/golang-docker-test-webbench"]
 
 # Document that the service listens on port 8080.
 EXPOSE 8080
