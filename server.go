@@ -5,7 +5,6 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"net/http/fcgi"
 	"os"
 	"os/signal"
 	"runtime"
@@ -19,8 +18,7 @@ var (
 )
 
 const (
-	SOCK    = "/tmp/go.sock"
-	VERSION = 125
+	VERSION = 126
 )
 
 type Server struct {
@@ -98,28 +96,8 @@ func main() {
 		}
 	}()
 
-	go func() {
-		tcp, err := net.Listen("tcp", ":9001")
-		if err != nil {
-			log.Fatal(err)
-		}
-		fcgi.Serve(tcp, server)
-	}()
-
-	go func() {
-		unix, err := net.Listen("unix", SOCK)
-		if err != nil {
-			log.Fatal(err)
-		}
-		fcgi.Serve(unix, server)
-	}()
-
 	fmt.Println("HTTP server is running on port 8080. Try 'curl -v localhost:8080' from another windows. To terminate, call 'curl localhost:8080/exit'")
 
 	s := <-sigchan
 	fmt.Println("Handling received signal ", s)
-
-	if err := os.Remove(SOCK); err != nil {
-		log.Fatal(err)
-	}
 }
