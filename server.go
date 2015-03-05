@@ -75,6 +75,11 @@ func (s Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
+	fmt.Println("Passed # of params:", len(os.Args)-1)
+	if len(os.Args) > 1 {
+		fmt.Println("Passed second param:", os.Args[1])
+	}
+
 	runtime.GOMAXPROCS(8)
 
 	sigchan := make(chan os.Signal, 1)
